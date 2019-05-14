@@ -1,0 +1,247 @@
+Sonar Cloud
+
+java-legacy-starter
+
+project key: neopragma_java-legacy-starter
+
+organization key: neopragma-github
+
+token: 91176c28735e3cbb7d1ba11e281873adf97577e7
+
+curl -u 91176c28735e3cbb7d1ba11e281873adf97577e7: https://sonarcloud.io/api/languages/list
+
+
+Java Bookstore
+
+project key: neopragma_java-bookstore 
+
+organization key: neopragma-github 
+
+token: 0964ed05d763f146e48ae3bf2c7fd1c75f33b453
+
+
+gradle: 
+
+plugins {
+  id "org.sonarqube" version "2.7"
+}
+
+
+run: 
+
+./gradlew sonarqube \
+  -Dsonar.projectKey=neopragma_java-bookstore \
+  -Dsonar.organization=neopragma-github \
+  -Dsonar.host.url=https://sonarcloud.io \
+  -Dsonar.login=0964ed05d763f146e48ae3bf2c7fd1c75f33b453
+
+
+
+curl -u 0964ed05d763f146e48ae3bf2c7fd1c75f33b453: https://sonarcloud.io/api/languages/list
+
+curl -u 0964ed05d763f146e48ae3bf2c7fd1c75f33b453: "https://sonarcloud.io/api/measures/component_tree?component=neopragma_java-bookstore&metricKeys=cognitive_complexity&qualifiers=FIL"
+
+----
+
+Get cognitive complexity value
+
+curl -u 91176c28735e3cbb7d1ba11e281873adf97577e7: "https://sonarcloud.io/api/measures/component_tree?component=neopragma_java-legacy-starter&metricKeys=cognitive_complexity&qualifiers=FIL"
+
+Sample result
+
+{
+  "paging":
+  {
+    "pageIndex":1,
+    "pageSize":100,
+    "total":3
+  },
+  "baseComponent":
+  {
+    "id":"AWltWYmzuiKBtBFjNfeN",
+    "key":"neopragma_java-legacy-starter",
+    "name":"legacy",
+    "qualifier":"TRK",
+    "measures":
+    [
+    ]
+  },
+  "components":
+  [
+    {
+      "id":"AWltXSku7asFM-bHdelM",
+      "key":"neopragma_java-legacy-starter:src/main/java/com/neopragma/legacy/screen/JobApplicant.java",
+      "name":"JobApplicant.java",
+      "qualifier":"FIL",
+      "path":"src/main/java/com/neopragma/legacy/screen/JobApplicant.java",
+      "language":"java","measures":
+      [
+        {
+          "metric":"cognitive_complexity",
+          "value":"29",
+          "bestValue":false
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelN",
+      "key":"neopragma_java-legacy-starter:src/main/java/com/neopragma/legacy/screen/package-info.java",
+      "name":"package-info.java",
+      "qualifier":"FIL",
+      "path":"src/main/java/com/neopragma/legacy/screen/package-info.java",
+      "language":"java",
+      "measures":
+      [
+        {
+          "metric":"cognitive_complexity",
+          "value":"0",
+          "bestValue":true
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelS",
+      "key":"neopragma_java-legacy-starter:pom.xml",
+      "name":"pom.xml",
+      "qualifier":"FIL",
+      "path":"pom.xml",
+      "language":"xml",
+      "measures":
+      [
+        {
+          "metric":"cognitive_complexity",
+          "value":"0",
+          "bestValue":true
+        }
+      ]
+    }
+  ]
+}
+
+
+Get total lines of code
+
+curl -u 91176c28735e3cbb7d1ba11e281873adf97577e7: "https://sonarcloud.io/api/measures/component_tree?component=neopragma_java-legacy-starter&metricKeys=ncloc"
+
+Sample result
+
+{
+  "paging":
+  {
+    "pageIndex":1,
+    "pageSize":100,
+    "total":7
+  },
+  "baseComponent":
+  {
+    "id":"AWltWYmzuiKBtBFjNfeN",
+    "key":"neopragma_java-legacy-starter",
+    "name":"legacy",
+    "qualifier":"TRK",
+    "measures":
+    [
+      {
+        "metric":"ncloc",
+        "value":"259"
+      }
+    ]
+  },
+  "components":
+  [
+    {
+      "id":"AWltXSku7asFM-bHdelM",
+      "key":"neopragma_java-legacy-starter:src/main/java/com/neopragma/legacy/screen/JobApplicant.java",
+      "name":"JobApplicant.java",
+      "qualifier":"FIL",
+      "path":"src/main/java/com/neopragma/legacy/screen/JobApplicant.java",
+      "language":"java",
+      "measures":
+      [
+        {
+          "metric":"ncloc",
+          "value":"190"
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelP",
+      "key":"neopragma_java-legacy-starter:src/test/java/com/neopragma/legacy/screen/JobApplicantTest.java",
+      "name":"JobApplicantTest.java",
+      "qualifier":"UTS",
+      "path":"src/test/java/com/neopragma/legacy/screen/JobApplicantTest.java",
+      "language":"java",
+      "measures":
+      [
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelO",
+      "key":"neopragma_java-legacy-starter:src/main/java/com/neopragma/legacy/screen",
+      "name":"main/java/com/neopragma/legacy/screen",
+      "qualifier":"DIR",
+      "path":"src/main/java/com/neopragma/legacy/screen",
+      "measures":
+      [
+        {
+          "metric":"ncloc",
+          "value":"191"
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelN",
+      "key":"neopragma_java-legacy-starter:src/main/java/com/neopragma/legacy/screen/package-info.java",
+      "name":"package-info.java",
+      "qualifier":"FIL",
+      "path":"src/main/java/com/neopragma/legacy/screen/package-info.java",
+      "language":"java",
+      "measures":
+      [
+        {
+          "metric":"ncloc",
+          "value":"1"
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelS",
+      "key":"neopragma_java-legacy-starter:pom.xml",
+      "name":"pom.xml",
+      "qualifier":"FIL",
+      "path":"pom.xml",
+      "language":"xml",
+      "measures":
+      [
+        {
+          "metric":"ncloc",
+          "value":"68"
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelR",
+      "key":"neopragma_java-legacy-starter:src",
+      "name":"src",
+      "qualifier":"DIR",
+      "path":"src",
+      "measures":
+      [
+        {
+          "metric":"ncloc",
+          "value":"191"
+        }
+      ]
+    },
+    {
+      "id":"AWltXSku7asFM-bHdelQ",
+      "key":"neopragma_java-legacy-starter:src/test/java/com/neopragma/legacy/screen",
+      "name":"test/java/com/neopragma/legacy/screen",
+      "qualifier":"DIR",
+      "path":"src/test/java/com/neopragma/legacy/screen",
+      "measures":
+      [
+      ]
+    }
+  ]
+}
+

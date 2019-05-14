@@ -1,0 +1,33 @@
+1. Sign up on Sonar Cloud.
+
+2. Create a Sonar Cloud project - connect it to a Github repo.
+
+3. Update build.gradle: 
+
+buildscript {
+    . . .
+    dependencies {
+        . . .
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7'
+        . . .
+    }
+}
+
+    . . .
+
+apply plugin: 'org.sonarqube'
+
+4. Run analysis. 
+
+./gradlew sonarqube \
+  -Dsonar.projectKey=neopragma_java-bookstore \
+  -Dsonar.organization=neopragma-github \
+  -Dsonar.host.url=https://sonarcloud.io \
+  -Dsonar.login=0964ed05d763f146e48ae3bf2c7fd1c75f33b453
+
+5. Get Cognitive Complexity and Lines of Code per class: 
+
+curl -u 0964ed05d763f146e48ae3bf2c7fd1c75f33b453: "https://sonarcloud.io/api/measures/component_tree?component=neopragma_java-bookstore&metricKeys=cognitive_complexity,ncloc&qualifiers=FIL" | jq
+
+
+
