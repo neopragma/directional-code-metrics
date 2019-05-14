@@ -152,7 +152,13 @@ Most of the data we need to track improvements in code health directionally can 
 
 If the team is using a kanban or kanban-like system, then they already have tooling in place to capture the cycle time for each work item (User Story, task, or whatever). Whether using tactile or electronic tools, each time a work item changes state, the team is capturing the timestamp for that change. 
 
-Assuming they are using the kanban system properly, a work item never moves backward in the system. They can calculate the Cycle Time for each work item by subtracting the timestamp when the item entered the first value-add state from the timestamp when the item moved to Done. Some electronic project management tools emit this information as a standard report. 
+Assuming they are using the kanban system properly, a work item never moves backward in the system. They can calculate the Cycle Time for each work item by subtracting the timestamp when the item entered the first value-add state from the timestamp when the item moved to Done. 
+
+Some electronic project management tools emit this information as a standard report. Here's an example from VersionOne, found at https://getnave.com/cycle-time-histogram-for-versionone. 
+
+![Figure 3: Sample Cycle Time report, VersionOne](img/cycle-time-histogram-for-versionone.png)
+
+The tool lets you filter the output by classes of service, which it calls "Labels" (right-hand side of screenshot). The example shows Cycle Times for all classes of service.
 
 Back-flows are an indication of a possible process improvement, but that doesn't mean a team will be able to eliminate them quickly or easily. They may be part of the team's reality, at least for a while. 
 
@@ -168,7 +174,9 @@ In a more traditional environment, production support may be handled by a separa
 
 ### 4.3. Static Analysis Rules 
 
+Choose static analysis rules that will help you track improvements in the code base you're working with. There's no "stock" answer for which rules will make sense in every case. 
 
+For this example, I chose *Cognitive Complexity* only. In real life, I might also choose one from the "security vulnerability" category and one from the "bugs" category, but I would avoid using a large number of rules. You already have a sense of what kinds of problems your code base has, so you can select rules that help you. 
 
 ### 4.4. Collecting Static Analysis Data 
 
@@ -178,9 +186,9 @@ Consult the documentation for the tool you're using to see how to pull data from
 
 I used SonarQube for these examples. To set up the Bookstore project, I connected it to my Sonar Cloud account. 
 
-Next, I decided which rules to use to track code health. For this example, I chose *Cognitive Complexity*. You will probably want to use more than one rule, but I suggest keeping the number pretty low; say, no more than 4. Choose rules according to the kinds of improvements you think the code base will need. 
+Next, I decided which rules to use to track code health. For this example, I chose *Cognitive Complexity*. 
 
-![Figure 3: SonarQube quality profile with 1 rule](img/11-sonarcloud-custom-profile.png)
+![Figure 4: SonarQube quality profile with 1 rule](img/11-sonarcloud-custom-profile.png)
 
 You will have to set up a SonarQube scan in your build. For the Bookstore project, I had to modify the build script to include SonarQube analysis. I made these changes to the build.gradle file:
 
@@ -286,7 +294,17 @@ Here's part of the output from that request. The output is quite long, even thou
 There's quite a bit more output that looks similar. The main things to notice here are: 
 
 - Each Java class is treated as a "component." 
-- Your code will have to examine the *value* value under *"metric": "cognitive_complexity" to determine which components are problematic.
+- Your code will have to examine the *value* value under *"metric": "cognitive_complexity"* to determine which components are problematic.
 - Your code will have to accumulate the *value* values under *"metric": "ncloc" for each problematic component to get the number of lines to use for the percentage calculation.
 - Your code will have to accumulate the *value* values under *"metric": "ncloc" for all components that have *"language": "java"* to calculate the total lines of code. 
+
+Here's how you might record the calculated percentages for several observations. 
+
+![Figure 5: Cognitive Complexity observations](img/cognitive-complexity-observations.png)
+
+Then you can use your spreadsheet's charting feature to visualize the trend: 
+
+![Figure 6: Cognitive Complexity trend](img/cognitive-complexity-trend.png)
+
+The trend is downward, which is the right *direction*. Hence the name, *directional metric*.
 
