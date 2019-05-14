@@ -82,8 +82,6 @@ The team may choose to measure Cycle Time separately for different types of work
 
 The premise is that as the code base improves, the team will require less time to make changes and test the changes adequately. 
 
-**Note:** Tracking mean Cycle Time alleviates problem 2.4 (psychological/political safety) when the team works collaboratively, as individual team members don't "own" specific parts of the code base. For teams that operate as a group of individual contributors, mean Cycle Time will point to individuals and will not address the safety problem. 
-
 #### 3.2.2. Production Support: Mean Time To Repair 
 
 Problems addressed: 2.1, 2.2, 2.3. 
@@ -99,8 +97,6 @@ The premise is that as the code base improves, the team will be able to diagnose
 - misunderstood requirements. 
 
 While those problems must be addressed, they are not directly related to the health of the application code base, and therefore can't serve as indicators of technical improvement. 
-
-**Aside:** You might argue that the first item can be affected by the health of the code. That's true, and the impact of improvements will be seen in the mean time to repair. A scaled microservices environment has the characteristics of a complex adaptive system. It is probably infeasible to measure emergent behaviors of a complex adaptive system in a way that would unambiguously demonstrate progress with technical improvement, as such systems do not exhibit linear cause and effect. 
 
 #### 3.2.3. Source Code: Static Code Analysis 
 
@@ -158,6 +154,10 @@ If the team is using a kanban or kanban-like system, then they already have tool
 
 Assuming they are using the kanban system properly, a work item never moves backward in the system. They can calculate the Cycle Time for each work item by subtracting the timestamp when the item entered the first value-add state from the timestamp when the item moved to Done. Some electronic project management tools emit this information as a standard report. 
 
+Back-flows are an indication of a possible process improvement, but that doesn't mean a team will be able to eliminate them quickly or easily. They may be part of the team's reality, at least for a while. 
+
+If the team's process has back-flows in it, then their visualization of the process has to support back-flows. Be aware that electronic kanban tools will lose track of the timestamps when you move an item backward on the board, so you'll have to capture the original timestamp for the item manually. Otherwise, the calculated Cycle Time for the item will only reflect its final pass through the system. 
+
 The mean Cycle Time is the average of these individual Cycle Time observations, possibly segregated by class of service, if that makes sense for the particular team. 
 
 ### 4.2. Mean Time To Repair 
@@ -166,10 +166,127 @@ If the team is a cross-functional team with end-to-end responsibility for the pr
 
 In a more traditional environment, production support may be handled by a separate group or team. In that case, they may be using a traditional issue tracking system rather than a project management system or kanban board. The *mean time to repair* will be the average of the individual repair times, calculated by subtracting the timestamp when the ticket was opened from the timestamp when it was closed. 
 
-### 4.3. Static Code Analysis Data 
+### 4.3. Static Analysis Rules 
 
 
 
-We want to collect the data routinely and automatically as part of our delivery process. To do that, we can't look at HTML pages, as in the examples above. SonarQube exposes APIs we can use to collect the data we need. 
+### 4.4. Collecting Static Analysis Data 
 
+We want to collect the data routinely and automatically as part of our delivery process. To do that, we can't look at HTML pages, as in the examples above. SonarQube exposes APIs we can use to collect the data we need. Other static analysis tools may do so, as well. 
+
+Consult the documentation for the tool you're using to see how to pull data from it. 
+
+I used SonarQube for these examples. To set up the Bookstore project, I connected it to my Sonar Cloud account. 
+
+Next, I decided which rules to use to track code health. For this example, I chose *Cognitive Complexity*. You will probably want to use more than one rule, but I suggest keeping the number pretty low; say, no more than 4. Choose rules according to the kinds of improvements you think the code base will need. 
+
+![Figure 3: SonarQube quality profile with 1 rule](img/11-sonarcloud-custom-profile.png)
+
+You will have to set up a SonarQube scan in your build. For the Bookstore project, I had to modify the build script to include SonarQube analysis. I made these changes to the build.gradle file:
+
+```
+buildscript {
+    . . .
+    dependencies {
+        . . .
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7'
+        . . .
+    }
+}
+
+    . . .
+
+apply plugin: 'org.sonarqube'
+```
+
+Then I ran the analysis like this: 
+
+```shell 
+./gradlew sonarqube \
+  -Dsonar.projectKey=neopragma_java-bookstore \
+  -Dsonar.organization=neopragma-github \
+  -Dsonar.host.url=https://sonarcloud.io \
+  -Dsonar.login=[secret login key here]
+```
+
+At that point, Sonar Cloud had the data from the analysis in its database. I could use the API to extract some of that data, like this (it's all one line, broken up here for readability):
+
+```shell 
+curl -u [secret login key here]:  
+"https://sonarcloud.io/api/  
+measures/component_tree  
+?component=neopragma_java-bookstore  
+&metricKeys=cognitive_complexity,  
+ncloc&qualifiers=FIL" | jq
+```
+
+This requests the results for *Cognitive Complexity* and the *total source line count*. 
+
+I piped the output through jq so I could read it on the console. When you write the custom code to consume the data, you won't need to do that. This is only for purposes of illustration. 
+
+Here's part of the output from that request. The output is quite long, even though this is a small "toy" project. 
+
+```shell 
+{
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 100,
+    "total": 14
+  },
+  "baseComponent": {
+    "id": "AWqx1WQSgvTe5u3ZToid",
+    "key": "neopragma_java-bookstore",
+    "name": "bookstore",
+    "description": "World's Smallest Bookstore",
+    "qualifier": "TRK",
+    "measures": []
+  },
+  "components": [
+    {
+      "id": "AWqx6DgGmUFavHkbQcCh",
+      "key": "neopragma_java-bookstore:src/main/java/com/leadingagile/bookstore/helpers/ApiHelper.java",
+      "name": "ApiHelper.java",
+      "qualifier": "FIL",
+      "path": "src/main/java/com/leadingagile/bookstore/helpers/ApiHelper.java",
+      "language": "java",
+      "measures": [
+        {
+          "metric": "cognitive_complexity",
+          "value": "1",
+          "bestValue": false
+        },
+        {
+          "metric": "ncloc",
+          "value": "32"
+        }
+      ]
+    },
+    {
+      "id": "AWqx6DgGmUFavHkbQcCq",
+      "key": "neopragma_java-bookstore:src/main/java/com/leadingagile/bookstore/model/Author.java",
+      "name": "Author.java",
+      "qualifier": "FIL",
+      "path": "src/main/java/com/leadingagile/bookstore/model/Author.java",
+      "language": "java",
+      "measures": [
+        {
+          "metric": "cognitive_complexity",
+          "value": "4",
+          "bestValue": false
+        },
+        {
+          "metric": "ncloc",
+          "value": "120"
+        }
+      ]
+    },
+. . .
+```
+
+There's quite a bit more output that looks similar. The main things to notice here are: 
+
+- Each Java class is treated as a "component." 
+- Your code will have to examine the *value* value under *"metric": "cognitive_complexity" to determine which components are problematic.
+- Your code will have to accumulate the *value* values under *"metric": "ncloc" for each problematic component to get the number of lines to use for the percentage calculation.
+- Your code will have to accumulate the *value* values under *"metric": "ncloc" for all components that have *"language": "java"* to calculate the total lines of code. 
 
